@@ -1,4 +1,5 @@
 # sorting_algos.py
+from collections import deque
 
 # generator using insertion sorting algo
 def insertion_sort(sequence: list):
@@ -63,10 +64,47 @@ def quick_sort(sequence: list):
 
     # partition helper function used to partition elements that are less than the pivot to the left
     # and elements that are greater than the pivot to the right
-    def parition(sequence: list, low: int, high: int):
-        start_index: int = low - 1
-        high_element: int = sequence[high]
+    def parition(sequence: list, low: int, high: int) -> int:
+        index: int = low - 1
+        pivot_element: int = sequence[high]
 
-        for i in range(1, high):
-            if sequence[start_index] <= high_element:
-                start_index += 1
+        for i in range(low, high):
+            if sequence[i] <= pivot_element:
+
+                # increment index of smaller element and swap
+                index += 1
+                sequence[index], sequence[i] = sequence[i], sequence[index]
+
+        sequence[index+1], sequence[high] = sequence[high], sequence[index+1]
+        return (index + 1)
+
+    # create a stack to store subarrays using deque from collections
+    low = 0
+    high = len(sequence) - 1
+    stack = deque()
+
+    # push initial values of low and high
+    stack.append(low)
+    stack.append(high)
+
+    # keep popping until stack is empty
+    while len(stack) > 0:
+
+        # pop low and high
+        high = stack.pop()
+        low = stack.pop()
+
+        # set pivot value to correct position
+        pivot = parition(sequence, low, high)
+        yield sequence
+
+        # if there are elements to the left side of the pivot, push left side to stack
+        if pivot - 1 > low:
+            stack.append(low)
+            stack.append(pivot - 1)
+
+        # if there are elements to the right side of the pivot, push right side to stack
+        if pivot + 1 < high:
+            stack.append(pivot + 1)
+            stack.append(high)
+    return
